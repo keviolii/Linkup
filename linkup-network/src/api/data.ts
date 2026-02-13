@@ -1,4 +1,4 @@
-import type { User, Post } from '@/types';
+import type { User, Post, Comment, Message, Conversation, Notification } from '@/types';
 
 // ═══════════════════════════════════════════════════════════
 // Mock Users
@@ -142,7 +142,7 @@ export function generatePosts(): Post[] {
       id: 'p1',
       authorId: 'u1',
       content:
-        "Just shipped a major accessibility overhaul for our design system! 🎉\n\nKey improvements:\n• Full keyboard navigation across all components\n• ARIA live regions for dynamic content\n• Reduced motion support\n• Screen reader announcements for state changes\n\nAccessibility isn't a feature — it's a requirement. Proud of what our team accomplished.",
+        "Just shipped a major accessibility overhaul for our design system! \n\nKey improvements:\n\u2022 Full keyboard navigation across all components\n\u2022 ARIA live regions for dynamic content\n\u2022 Reduced motion support\n\u2022 Screen reader announcements for state changes\n\nAccessibility isn't a feature \u2014 it's a requirement. Proud of what our team accomplished.",
       timestamp: Date.now() - 3_600_000,
       reactions: { like: 142, celebrate: 38, insightful: 24 },
       comments: 18,
@@ -152,7 +152,7 @@ export function generatePosts(): Post[] {
       id: 'p2',
       authorId: 'u2',
       content:
-        "Hot take: The best frontend engineers I've hired didn't just know React.\n\nThey understood:\n→ Browser rendering pipeline\n→ Network performance\n→ Accessibility fundamentals\n→ CSS layout algorithms\n→ JavaScript event loop\n\nFrameworks change. Fundamentals don't.\n\nWhat would you add to this list?",
+        "Hot take: The best frontend engineers I've hired didn't just know React.\n\nThey understood:\n\u2192 Browser rendering pipeline\n\u2192 Network performance\n\u2192 Accessibility fundamentals\n\u2192 CSS layout algorithms\n\u2192 JavaScript event loop\n\nFrameworks change. Fundamentals don't.\n\nWhat would you add to this list?",
       timestamp: Date.now() - 7_200_000,
       reactions: { like: 287, celebrate: 12, insightful: 95 },
       comments: 63,
@@ -172,7 +172,7 @@ export function generatePosts(): Post[] {
       id: 'p4',
       authorId: 'u4',
       content:
-        "Beautiful UI isn't just about aesthetics — it's about communication.\n\nEvery animation should have a purpose.\nEvery color choice should guide attention.\nEvery spacing decision should create hierarchy.\n\nDesign engineering is about making interfaces that feel inevitable.",
+        "Beautiful UI isn't just about aesthetics \u2014 it's about communication.\n\nEvery animation should have a purpose.\nEvery color choice should guide attention.\nEvery spacing decision should create hierarchy.\n\nDesign engineering is about making interfaces that feel inevitable.",
       timestamp: Date.now() - 28_800_000,
       reactions: { like: 156, celebrate: 23, insightful: 41 },
       comments: 27,
@@ -202,7 +202,7 @@ export function generatePosts(): Post[] {
       id: 'p7',
       authorId: 'u3',
       content:
-        "Your bundle size is your user's problem.\n\nJust audited a React app:\n• 2.4MB JavaScript (gzipped!)\n• 47 npm packages for a CRUD app\n• moment.js still in there (2023!)\n\nSwitch to date-fns. Use dynamic imports. Tree-shake your dependencies.\n\nYour users on 3G will thank you.",
+        "Your bundle size is your user's problem.\n\nJust audited a React app:\n\u2022 2.4MB JavaScript (gzipped!)\n\u2022 47 npm packages for a CRUD app\n\u2022 moment.js still in there (2023!)\n\nSwitch to date-fns. Use dynamic imports. Tree-shake your dependencies.\n\nYour users on 3G will thank you.",
       timestamp: Date.now() - 72_000_000,
       reactions: { like: 178, insightful: 56, celebrate: 8 },
       comments: 29,
@@ -218,5 +218,149 @@ export function generatePosts(): Post[] {
       comments: 89,
       reposts: 52,
     },
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════
+// Mock Comments (seeded)
+// ═══════════════════════════════════════════════════════════
+
+export function generateComments(): Comment[] {
+  return [
+    {
+      id: 'c1',
+      authorId: 'u2',
+      postId: 'p1',
+      content: 'This is incredible work, Sarah! Accessibility-first design systems are so rare. Would love to see a blog post about your approach to ARIA live regions.',
+      timestamp: Date.now() - 3_000_000,
+      parentId: null,
+    },
+    {
+      id: 'c2',
+      authorId: 'u5',
+      postId: 'p1',
+      content: 'As someone who works on accessibility daily, this makes me so happy. The reduced motion support is often overlooked. Great job!',
+      timestamp: Date.now() - 2_800_000,
+      parentId: null,
+    },
+    {
+      id: 'c3',
+      authorId: 'u1',
+      postId: 'p1',
+      content: 'Thanks Marcus! I\'m actually working on a deep-dive blog post right now. Will share it here when it\'s ready.',
+      timestamp: Date.now() - 2_500_000,
+      parentId: 'c1',
+    },
+    {
+      id: 'c4',
+      authorId: 'u3',
+      postId: 'p1',
+      content: 'Did you measure any performance impact from the ARIA live regions? We had some issues with excessive re-renders.',
+      timestamp: Date.now() - 2_200_000,
+      parentId: null,
+    },
+    {
+      id: 'c5',
+      authorId: 'u1',
+      postId: 'p1',
+      content: 'Good question Priya! We debounce the announcements and use a single shared live region. No measurable perf impact.',
+      timestamp: Date.now() - 2_000_000,
+      parentId: 'c4',
+    },
+    {
+      id: 'c6',
+      authorId: 'u4',
+      postId: 'p2',
+      content: 'I\'d add CSS architecture to the list. Understanding specificity, cascade layers, and container queries is crucial.',
+      timestamp: Date.now() - 6_800_000,
+      parentId: null,
+    },
+    {
+      id: 'c7',
+      authorId: 'u1',
+      postId: 'p2',
+      content: '100% agree with this. Framework knowledge gets you the interview, but fundamentals help you solve real problems.',
+      timestamp: Date.now() - 6_500_000,
+      parentId: null,
+    },
+    {
+      id: 'c8',
+      authorId: 'u5',
+      postId: 'p2',
+      content: 'Accessibility should definitely be on this list! Understanding how assistive technology works changes how you think about UI.',
+      timestamp: Date.now() - 6_200_000,
+      parentId: null,
+    },
+    {
+      id: 'c9',
+      authorId: 'u3',
+      postId: 'p3',
+      content: 'The streaming SSR was the biggest win for us too. The time-to-first-byte improvement was dramatic.',
+      timestamp: Date.now() - 13_000_000,
+      parentId: null,
+    },
+    {
+      id: 'c10',
+      authorId: 'u2',
+      postId: 'p5',
+      content: 'This needs to be required reading for every product team. Sharing with my org.',
+      timestamp: Date.now() - 40_000_000,
+      parentId: null,
+    },
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════
+// Mock Conversations & Messages
+// ═══════════════════════════════════════════════════════════
+
+export function generateMessages(): Message[] {
+  return [
+    { id: 'm1', conversationId: 'conv1', senderId: 'u2', content: 'Hey Sarah! Loved your accessibility post. Our team is looking for advice on screen reader testing.', timestamp: Date.now() - 7_200_000 },
+    { id: 'm2', conversationId: 'conv1', senderId: 'u1', content: 'Thanks Marcus! I\'d recommend starting with VoiceOver on Mac and NVDA on Windows. Happy to chat more about it.', timestamp: Date.now() - 6_800_000 },
+    { id: 'm3', conversationId: 'conv1', senderId: 'u2', content: 'That would be amazing. Could we set up a quick call this week?', timestamp: Date.now() - 6_400_000 },
+    { id: 'm4', conversationId: 'conv2', senderId: 'u3', content: 'Hi Sarah, I saw your TypeScript discriminated unions post. We\'re using a similar pattern at Netflix for our API layer.', timestamp: Date.now() - 50_000_000 },
+    { id: 'm5', conversationId: 'conv2', senderId: 'u1', content: 'Oh nice! Are you using exhaustive checks with never type too?', timestamp: Date.now() - 49_000_000 },
+    { id: 'm6', conversationId: 'conv2', senderId: 'u3', content: 'Yes! It\'s been a game changer for catching unhandled cases at compile time.', timestamp: Date.now() - 48_000_000 },
+    { id: 'm7', conversationId: 'conv3', senderId: 'u5', content: 'Sarah, would you be interested in co-presenting at the next accessibility summit?', timestamp: Date.now() - 100_000_000 },
+    { id: 'm8', conversationId: 'conv3', senderId: 'u1', content: 'Absolutely! What topics are you thinking about?', timestamp: Date.now() - 99_000_000 },
+  ];
+}
+
+export function generateConversations(): Conversation[] {
+  const messages = generateMessages();
+  return [
+    {
+      id: 'conv1',
+      participantIds: ['u1', 'u2'],
+      lastMessage: messages.find(m => m.id === 'm3'),
+      unreadCount: 1,
+    },
+    {
+      id: 'conv2',
+      participantIds: ['u1', 'u3'],
+      lastMessage: messages.find(m => m.id === 'm6'),
+      unreadCount: 0,
+    },
+    {
+      id: 'conv3',
+      participantIds: ['u1', 'u5'],
+      lastMessage: messages.find(m => m.id === 'm8'),
+      unreadCount: 0,
+    },
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════
+// Mock Notifications
+// ═══════════════════════════════════════════════════════════
+
+export function generateNotifications(): Notification[] {
+  return [
+    { id: 'n1', type: 'reaction', fromUserId: 'u2', timestamp: Date.now() - 7_200_000, read: false, relatedPostId: 'p1', message: 'Marcus Johnson reacted to your post' },
+    { id: 'n2', type: 'comment', fromUserId: 'u3', timestamp: Date.now() - 14_400_000, read: false, relatedPostId: 'p1', message: 'Priya Sharma commented on your post' },
+    { id: 'n3', type: 'connection_accepted', fromUserId: 'u5', timestamp: Date.now() - 86_400_000, read: true, message: 'Jordan Kim accepted your connection request' },
+    { id: 'n4', type: 'mention', fromUserId: 'u4', timestamp: Date.now() - 172_800_000, read: true, relatedPostId: 'p4', message: 'Alex Rivera mentioned you in a comment' },
+    { id: 'n5', type: 'reaction', fromUserId: 'u5', timestamp: Date.now() - 259_200_000, read: true, relatedPostId: 'p6', message: 'Your post reached 200 reactions!' },
   ];
 }

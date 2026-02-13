@@ -5,4 +5,6 @@ export {
   useReducedMotion,
   useInfiniteScroll,
   useThrottle,
+  useDebounce,
 } from './useAccessibility';
+export { useTheme } from './useTheme';

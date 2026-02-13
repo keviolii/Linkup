@@ -5,3 +5,7 @@ export { PostComposer } from './PostComposer';
 export { PostCard } from './PostCard';
 export { TrendingSidebar, SuggestedConnections } from './Sidebar';
 export { Footer } from './Footer';
+export { CommentThread } from './CommentThread';
+export { SearchResults } from './SearchResults';
+export { ConfirmDialog } from './ConfirmDialog';
+export { MessagingPanel } from './MessagingPanel';

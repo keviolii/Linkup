@@ -1,11 +1,11 @@
 import { memo, useRef, useState } from 'react';
-import { tokens } from '@/styles/tokens';
-import { useApp, useAnnounce, useFocusTrap } from '@/hooks';
+import { useApp, useAnnounce, useFocusTrap, useTheme } from '@/hooks';
 import { api } from '@/api';
 import { Avatar } from './Avatar';
 
 export const PostComposer: React.FC = memo(() => {
   const { state, dispatch } = useApp();
+  const { colors } = useTheme();
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const composerRef = useRef<HTMLDivElement>(null);
@@ -20,7 +20,6 @@ export const PostComposer: React.FC = memo(() => {
     if (!content.trim() || isSubmitting) return;
     setIsSubmitting(true);
 
-    // Optimistic update — post appears instantly
     const optimisticPost = {
       id: `temp-${Date.now()}`,
       authorId: state.currentUser.id,
@@ -37,7 +36,6 @@ export const PostComposer: React.FC = memo(() => {
     announce('Post published successfully');
     setContent('');
 
-    // Confirm with mock API
     try {
       await api.createPost(content.trim(), state.currentUser.id);
     } catch {
@@ -51,14 +49,13 @@ export const PostComposer: React.FC = memo(() => {
     if (e.key === 'Escape') dispatch({ type: 'TOGGLE_COMPOSER' });
   };
 
-  // Collapsed state
   if (!state.composerOpen) {
     return (
       <div
         style={{
-          background: tokens.colors.bgCard,
-          borderRadius: tokens.radii.lg,
-          border: `1px solid ${tokens.colors.border}`,
+          background: colors.bgCard,
+          borderRadius: '16px',
+          border: `1px solid ${colors.border}`,
           padding: 20,
           marginBottom: 16,
         }}
@@ -71,22 +68,18 @@ export const PostComposer: React.FC = memo(() => {
             style={{
               flex: 1,
               padding: '12px 20px',
-              borderRadius: tokens.radii.full,
-              border: `1px solid ${tokens.colors.border}`,
-              background: tokens.colors.bgInput,
-              color: tokens.colors.textTertiary,
+              borderRadius: '9999px',
+              border: `1px solid ${colors.border}`,
+              background: colors.bgInput,
+              color: colors.textTertiary,
               fontSize: 15,
-              fontFamily: tokens.fonts.body,
+              fontFamily: "'DM Sans', sans-serif",
               textAlign: 'left',
               cursor: 'pointer',
               transition: 'all 0.2s',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = tokens.colors.textTertiary;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = tokens.colors.border;
-            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = colors.textTertiary; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = colors.border; }}
           >
             What's on your mind, {state.currentUser.name.split(' ')[0]}?
           </button>
@@ -95,7 +88,6 @@ export const PostComposer: React.FC = memo(() => {
     );
   }
 
-  // Expanded composer
   return (
     <div
       ref={composerRef}
@@ -103,39 +95,22 @@ export const PostComposer: React.FC = memo(() => {
       aria-label="Create a post"
       aria-modal="false"
       style={{
-        background: tokens.colors.bgCard,
-        borderRadius: tokens.radii.lg,
-        border: `1px solid ${tokens.colors.borderFocus}`,
+        background: colors.bgCard,
+        borderRadius: '16px',
+        border: `1px solid ${colors.borderFocus}`,
         padding: 20,
         marginBottom: 16,
-        boxShadow: tokens.shadows.glow,
+        boxShadow: '0 0 20px rgba(99,102,241,0.15)',
         animation: 'slideDown 0.25s ease-out',
       }}
     >
-      {/* Author row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          marginBottom: 16,
-        }}
-      >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
         <Avatar user={state.currentUser} size={44} tabIndex={-1} />
         <div>
-          <div
-            style={{
-              fontWeight: 700,
-              color: tokens.colors.textPrimary,
-              fontSize: 15,
-              fontFamily: tokens.fonts.display,
-            }}
-          >
+          <div style={{ fontWeight: 700, color: colors.textPrimary, fontSize: 15, fontFamily: "'DM Sans', sans-serif" }}>
             {state.currentUser.name}
           </div>
-          <div style={{ fontSize: 12, color: tokens.colors.textTertiary }}>
-            Posting publicly
-          </div>
+          <div style={{ fontSize: 12, color: colors.textTertiary }}>Posting publicly</div>
         </div>
         <button
           onClick={() => dispatch({ type: 'TOGGLE_COMPOSER' })}
@@ -144,25 +119,20 @@ export const PostComposer: React.FC = memo(() => {
             marginLeft: 'auto',
             background: 'none',
             border: 'none',
-            color: tokens.colors.textTertiary,
+            color: colors.textTertiary,
             fontSize: 20,
             cursor: 'pointer',
             padding: 4,
-            borderRadius: tokens.radii.sm,
+            borderRadius: '8px',
             transition: 'color 0.2s',
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = tokens.colors.textPrimary;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = tokens.colors.textTertiary;
-          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = colors.textPrimary; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = colors.textTertiary; }}
         >
           ✕
         </button>
       </div>
 
-      {/* Textarea */}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value.slice(0, charLimit))}
@@ -179,15 +149,14 @@ export const PostComposer: React.FC = memo(() => {
           background: 'transparent',
           border: 'none',
           outline: 'none',
-          color: tokens.colors.textPrimary,
+          color: colors.textPrimary,
           fontSize: 15,
           lineHeight: 1.6,
-          fontFamily: tokens.fonts.body,
+          fontFamily: "'DM Sans', sans-serif",
           padding: 0,
         }}
       />
 
-      {/* Toolbar */}
       <div
         style={{
           display: 'flex',
@@ -195,7 +164,7 @@ export const PostComposer: React.FC = memo(() => {
           justifyContent: 'space-between',
           marginTop: 16,
           paddingTop: 16,
-          borderTop: `1px solid ${tokens.colors.border}`,
+          borderTop: `1px solid ${colors.border}`,
         }}
       >
         <div style={{ display: 'flex', gap: 8 }}>
@@ -204,24 +173,18 @@ export const PostComposer: React.FC = memo(() => {
               key={item}
               aria-label={item.split(' ')[1]}
               style={{
-                background: tokens.colors.bgInput,
-                border: `1px solid ${tokens.colors.border}`,
-                borderRadius: tokens.radii.full,
+                background: colors.bgInput,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '9999px',
                 padding: '6px 14px',
                 fontSize: 13,
-                color: tokens.colors.textSecondary,
+                color: colors.textSecondary,
                 cursor: 'pointer',
-                fontFamily: tokens.fonts.body,
+                fontFamily: "'DM Sans', sans-serif",
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = tokens.colors.accent;
-                e.currentTarget.style.color = tokens.colors.accent;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = tokens.colors.border;
-                e.currentTarget.style.color = tokens.colors.textSecondary;
-              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = colors.accent; e.currentTarget.style.color = colors.accent; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.color = colors.textSecondary; }}
             >
               {item}
             </button>
@@ -234,10 +197,7 @@ export const PostComposer: React.FC = memo(() => {
             aria-live="polite"
             style={{
               fontSize: 12,
-              color:
-                remaining < 100
-                  ? tokens.colors.warning
-                  : tokens.colors.textTertiary,
+              color: remaining < 100 ? colors.warning : colors.textTertiary,
             }}
           >
             {remaining < 200 ? `${remaining} characters remaining` : ''}
@@ -248,21 +208,19 @@ export const PostComposer: React.FC = memo(() => {
             aria-label="Publish post"
             style={{
               background: content.trim()
-                ? `linear-gradient(135deg, ${tokens.colors.accent}, #a78bfa)`
-                : tokens.colors.bgInput,
+                ? `linear-gradient(135deg, ${colors.accent}, #a78bfa)`
+                : colors.bgInput,
               border: 'none',
-              borderRadius: tokens.radii.full,
+              borderRadius: '9999px',
               padding: '10px 28px',
-              color: content.trim() ? '#fff' : tokens.colors.textTertiary,
+              color: content.trim() ? '#fff' : colors.textTertiary,
               fontSize: 14,
               fontWeight: 700,
-              fontFamily: tokens.fonts.display,
+              fontFamily: "'DM Sans', sans-serif",
               cursor: content.trim() ? 'pointer' : 'not-allowed',
               transition: 'all 0.3s',
               opacity: isSubmitting ? 0.7 : 1,
-              boxShadow: content.trim()
-                ? '0 4px 16px rgba(99,102,241,0.3)'
-                : 'none',
+              boxShadow: content.trim() ? '0 4px 16px rgba(99,102,241,0.3)' : 'none',
             }}
           >
             {isSubmitting ? 'Publishing...' : 'Post'}
@@ -270,35 +228,10 @@ export const PostComposer: React.FC = memo(() => {
         </div>
       </div>
 
-      {/* Keyboard hint */}
-      <p
-        style={{
-          fontSize: 11,
-          color: tokens.colors.textTertiary,
-          marginTop: 8,
-        }}
-      >
-        <kbd
-          style={{
-            background: tokens.colors.bgInput,
-            padding: '2px 6px',
-            borderRadius: 4,
-            fontSize: 11,
-          }}
-        >
-          ⌘
-        </kbd>{' '}
+      <p style={{ fontSize: 11, color: colors.textTertiary, marginTop: 8 }}>
+        <kbd style={{ background: colors.bgInput, padding: '2px 6px', borderRadius: 4, fontSize: 11 }}>\u2318</kbd>{' '}
         +{' '}
-        <kbd
-          style={{
-            background: tokens.colors.bgInput,
-            padding: '2px 6px',
-            borderRadius: 4,
-            fontSize: 11,
-          }}
-        >
-          Enter
-        </kbd>{' '}
+        <kbd style={{ background: colors.bgInput, padding: '2px 6px', borderRadius: 4, fontSize: 11 }}>Enter</kbd>{' '}
         to post
       </p>
     </div>

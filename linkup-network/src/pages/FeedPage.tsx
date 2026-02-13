@@ -1,19 +1,18 @@
 import { useCallback, useEffect } from 'react';
-import { useApp, useAnnounce, useInfiniteScroll } from '@/hooks';
+import { useApp, useAnnounce, useInfiniteScroll, useTheme } from '@/hooks';
 import { api } from '@/api';
-import { tokens } from '@/styles/tokens';
 import { PostComposer, PostCard } from '@/components';
 
 /** Skeleton loader for feed items */
-const FeedSkeleton: React.FC = () => (
+const FeedSkeleton: React.FC<{ colors: ReturnType<typeof useTheme>['colors'] }> = ({ colors }) => (
   <div aria-label="Loading more posts">
     {[1, 2].map((i) => (
       <div
         key={i}
         style={{
-          background: tokens.colors.bgCard,
-          borderRadius: tokens.radii.lg,
-          border: `1px solid ${tokens.colors.border}`,
+          background: colors.bgCard,
+          borderRadius: '16px',
+          border: `1px solid ${colors.border}`,
           padding: 20,
           marginBottom: 16,
           animation: 'pulse 1.5s infinite',
@@ -24,8 +23,8 @@ const FeedSkeleton: React.FC = () => (
             style={{
               width: 48,
               height: 48,
-              borderRadius: tokens.radii.full,
-              background: tokens.colors.bgInput,
+              borderRadius: '9999px',
+              background: colors.bgInput,
             }}
           />
           <div style={{ flex: 1 }}>
@@ -33,7 +32,7 @@ const FeedSkeleton: React.FC = () => (
               style={{
                 width: '40%',
                 height: 14,
-                background: tokens.colors.bgInput,
+                background: colors.bgInput,
                 borderRadius: 4,
                 marginBottom: 8,
               }}
@@ -42,7 +41,7 @@ const FeedSkeleton: React.FC = () => (
               style={{
                 width: '60%',
                 height: 12,
-                background: tokens.colors.bgInput,
+                background: colors.bgInput,
                 borderRadius: 4,
               }}
             />
@@ -52,7 +51,7 @@ const FeedSkeleton: React.FC = () => (
           style={{
             width: '100%',
             height: 12,
-            background: tokens.colors.bgInput,
+            background: colors.bgInput,
             borderRadius: 4,
             marginBottom: 8,
           }}
@@ -61,7 +60,7 @@ const FeedSkeleton: React.FC = () => (
           style={{
             width: '85%',
             height: 12,
-            background: tokens.colors.bgInput,
+            background: colors.bgInput,
             borderRadius: 4,
             marginBottom: 8,
           }}
@@ -70,7 +69,7 @@ const FeedSkeleton: React.FC = () => (
           style={{
             width: '70%',
             height: 12,
-            background: tokens.colors.bgInput,
+            background: colors.bgInput,
             borderRadius: 4,
           }}
         />
@@ -81,6 +80,7 @@ const FeedSkeleton: React.FC = () => (
 
 export const FeedPage: React.FC = () => {
   const { state, dispatch } = useApp();
+  const { colors } = useTheme();
   const announce = useAnnounce();
 
   const loadMore = useCallback(async () => {
@@ -119,7 +119,7 @@ export const FeedPage: React.FC = () => {
         ))}
       </div>
 
-      {state.feedLoading && <FeedSkeleton />}
+      {state.feedLoading && <FeedSkeleton colors={colors} />}
 
       {/* Infinite scroll sentinel */}
       <div ref={sentinelRef} style={{ height: 1 }} />
@@ -128,10 +128,10 @@ export const FeedPage: React.FC = () => {
         <p
           style={{
             textAlign: 'center',
-            color: tokens.colors.textTertiary,
+            color: colors.textTertiary,
             fontSize: 14,
             padding: '24px 0',
-            fontFamily: tokens.fonts.body,
+            fontFamily: "'DM Sans', sans-serif",
           }}
         >
           You're all caught up ✓

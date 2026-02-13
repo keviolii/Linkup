@@ -121,3 +121,18 @@ export function useThrottle<T extends (...args: never[]) => void>(
     [fn, ms],
   );
 }
+
+// ═══════════════════════════════════════════════════════════
+// useDebounce — Debounce a value
+// ═══════════════════════════════════════════════════════════
+
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}

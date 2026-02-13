@@ -1,7 +1,6 @@
 import { memo } from 'react';
-import { tokens } from '@/styles/tokens';
-import { useApp } from '@/hooks';
-import { MOCK_USERS } from '@/api';
+import { useApp, useAnnounce, useTheme } from '@/hooks';
+import { MOCK_USERS, api } from '@/api';
 import { Avatar } from './Avatar';
 
 // ─── Trending Topics ──────────────────────────────────────────
@@ -14,81 +13,102 @@ const TOPICS = [
   { tag: '#DesignSystems', posts: '876' },
 ];
 
-export const TrendingSidebar: React.FC = memo(() => (
-  <aside
-    aria-label="Trending topics"
-    style={{
-      background: tokens.colors.bgCard,
-      borderRadius: tokens.radii.lg,
-      border: `1px solid ${tokens.colors.border}`,
-      padding: 20,
-      marginBottom: 16,
-    }}
-  >
-    <h2
+export const TrendingSidebar: React.FC = memo(() => {
+  const { colors } = useTheme();
+
+  return (
+    <aside
+      aria-label="Trending topics"
       style={{
-        fontSize: 16,
-        fontWeight: 700,
-        color: tokens.colors.textPrimary,
-        fontFamily: tokens.fonts.display,
-        margin: '0 0 16px',
+        background: colors.bgCard,
+        borderRadius: '16px',
+        border: `1px solid ${colors.border}`,
+        padding: 20,
+        marginBottom: 16,
       }}
     >
-      Trending
-    </h2>
-    {TOPICS.map((t) => (
-      <button
-        key={t.tag}
+      <h2
         style={{
-          display: 'block',
-          width: '100%',
-          background: 'none',
-          border: 'none',
-          padding: '10px 0',
-          cursor: 'pointer',
-          textAlign: 'left',
-          borderTop: `1px solid ${tokens.colors.border}`,
+          fontSize: 16,
+          fontWeight: 700,
+          color: colors.textPrimary,
+          fontFamily: "'DM Sans', sans-serif",
+          margin: '0 0 16px',
         }}
       >
-        <div
+        Trending
+      </h2>
+      {TOPICS.map((t) => (
+        <button
+          key={t.tag}
           style={{
-            fontWeight: 600,
-            fontSize: 14,
-            color: tokens.colors.accent,
-            fontFamily: tokens.fonts.display,
+            display: 'block',
+            width: '100%',
+            background: 'none',
+            border: 'none',
+            padding: '10px 0',
+            cursor: 'pointer',
+            textAlign: 'left',
+            borderTop: `1px solid ${colors.border}`,
           }}
         >
-          {t.tag}
-        </div>
-        <div
-          style={{
-            fontSize: 12,
-            color: tokens.colors.textTertiary,
-            marginTop: 2,
-          }}
-        >
-          {t.posts} posts
-        </div>
-      </button>
-    ))}
-  </aside>
-));
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: 14,
+              color: colors.accent,
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            {t.tag}
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              color: colors.textTertiary,
+              marginTop: 2,
+            }}
+          >
+            {t.posts} posts
+          </div>
+        </button>
+      ))}
+    </aside>
+  );
+});
 
 TrendingSidebar.displayName = 'TrendingSidebar';
 
 // ─── Suggested Connections ────────────────────────────────────
 
 export const SuggestedConnections: React.FC = memo(() => {
-  const { dispatch } = useApp();
-  const suggestions = MOCK_USERS.slice(1, 4);
+  const { state, dispatch } = useApp();
+  const { colors } = useTheme();
+  const announce = useAnnounce();
+  const suggestions = MOCK_USERS.filter((u) => u.id !== state.currentUser.id).slice(0, 3);
+
+  const handleConnect = async (userId: string) => {
+    const res = await api.sendConnectionRequest(state.currentUser.id, userId);
+    dispatch({ type: 'CONNECTION_REQUEST_SENT', request: res.data });
+    announce('Connection request sent');
+  };
+
+  const getStatus = (userId: string) => {
+    if (state.connections.includes(userId)) return 'connected';
+    if (state.pendingRequests.some((r) =>
+      (r.fromUserId === state.currentUser.id && r.toUserId === userId) ||
+      (r.fromUserId === userId && r.toUserId === state.currentUser.id)
+    )) return 'pending';
+    return 'none';
+  };
 
   return (
     <aside
       aria-label="Suggested connections"
       style={{
-        background: tokens.colors.bgCard,
-        borderRadius: tokens.radii.lg,
-        border: `1px solid ${tokens.colors.border}`,
+        background: colors.bgCard,
+        borderRadius: '16px',
+        border: `1px solid ${colors.border}`,
         padding: 20,
       }}
     >
@@ -96,93 +116,98 @@ export const SuggestedConnections: React.FC = memo(() => {
         style={{
           fontSize: 16,
           fontWeight: 700,
-          color: tokens.colors.textPrimary,
-          fontFamily: tokens.fonts.display,
+          color: colors.textPrimary,
+          fontFamily: "'DM Sans', sans-serif",
           margin: '0 0 16px',
         }}
       >
         People you may know
       </h2>
-      {suggestions.map((user) => (
-        <div
-          key={user.id}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '12px 0',
-            borderTop: `1px solid ${tokens.colors.border}`,
-          }}
-        >
-          <Avatar
-            user={user}
-            size={40}
-            onClick={() =>
-              dispatch({ type: 'NAVIGATE', route: 'profile', profile: user })
-            }
-          />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <button
-              onClick={() =>
-                dispatch({
-                  type: 'NAVIGATE',
-                  route: 'profile',
-                  profile: user,
-                })
-              }
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: 14,
-                color: tokens.colors.textPrimary,
-                fontFamily: tokens.fonts.display,
-                textAlign: 'left',
-                display: 'block',
-              }}
-            >
-              {user.name}
-            </button>
-            <p
-              style={{
-                fontSize: 12,
-                color: tokens.colors.textTertiary,
-                margin: '2px 0 0',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {user.headline.split('•')[0].trim()}
-            </p>
-          </div>
-          <button
+      {suggestions.map((user) => {
+        const status = getStatus(user.id);
+        return (
+          <div
+            key={user.id}
             style={{
-              background: 'none',
-              border: `1px solid ${tokens.colors.accent}`,
-              borderRadius: tokens.radii.full,
-              padding: '5px 14px',
-              fontSize: 12,
-              fontWeight: 600,
-              color: tokens.colors.accent,
-              cursor: 'pointer',
-              fontFamily: tokens.fonts.display,
-              transition: 'all 0.2s',
-              whiteSpace: 'nowrap',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = tokens.colors.accentSoft;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'none';
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '12px 0',
+              borderTop: `1px solid ${colors.border}`,
             }}
           >
-            + Connect
-          </button>
-        </div>
-      ))}
+            <Avatar
+              user={user}
+              size={40}
+              onClick={() =>
+                dispatch({ type: 'NAVIGATE', route: 'profile', profile: user })
+              }
+            />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <button
+                onClick={() =>
+                  dispatch({
+                    type: 'NAVIGATE',
+                    route: 'profile',
+                    profile: user,
+                  })
+                }
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: 14,
+                  color: colors.textPrimary,
+                  fontFamily: "'DM Sans', sans-serif",
+                  textAlign: 'left',
+                  display: 'block',
+                }}
+              >
+                {user.name}
+              </button>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: colors.textTertiary,
+                  margin: '2px 0 0',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {user.headline.split('\u2022')[0].trim()}
+              </p>
+            </div>
+            <button
+              onClick={() => status === 'none' && handleConnect(user.id)}
+              disabled={status !== 'none'}
+              style={{
+                background: 'none',
+                border: `1px solid ${status === 'connected' ? colors.success : status === 'pending' ? colors.warning : colors.accent}`,
+                borderRadius: '9999px',
+                padding: '5px 14px',
+                fontSize: 12,
+                fontWeight: 600,
+                color: status === 'connected' ? colors.success : status === 'pending' ? colors.warning : colors.accent,
+                cursor: status === 'none' ? 'pointer' : 'default',
+                fontFamily: "'DM Sans', sans-serif",
+                transition: 'all 0.2s',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={(e) => {
+                if (status === 'none') e.currentTarget.style.background = colors.accentSoft;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'none';
+              }}
+            >
+              {status === 'connected' ? 'Connected' : status === 'pending' ? 'Pending' : '+ Connect'}
+            </button>
+          </div>
+        );
+      })}
     </aside>
   );
 });
